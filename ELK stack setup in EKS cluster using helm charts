@@ -1,0 +1,26 @@
+
+ELK stack setup in EKS cluster using helm charts:
+-------------------------------------------------
+
+Reference -https://phoenixnap.com/kb/elasticsearch-helm-chart
+
+
+Elasticsearch setup in EKS cluster:
+------------------------------------
+
+1) Add the helm chart using below command
+     helm repo add elastic https://helm.elastic.co
+2) Download the values file using below command and make changes if need any
+     curl -O https://raw.githubusercontent.com/elastic/helm-charts/master/elasticsearch/examples/minikube/values.yaml
+3) Install the elasticsearch with values file using below command
+     helm install elasticsearch elastic/elasticsearch -f ./values.yaml
+	                      or
+   If need to install elasticsearch in different namespace then run below command by replacing namespace namespace
+     helm install elasticsearch elastic/elasticsearch -n [namespace] -f ./values.yaml
+4) Use below command to check the pod status
+     kubectl get pods --namespace=default -l app=elasticsearch-master -w
+5) Check the helm using below command
+     helm test elasticsearch
+6) If need to do port forwarding, use below command
+     kubectl port-forward svc/elasticsearch-master 9200
+7) Service name will be the endpoint for elastic search and no password for elastic search
