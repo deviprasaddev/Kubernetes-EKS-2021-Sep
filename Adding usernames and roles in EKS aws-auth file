@@ -1,0 +1,39 @@
+Adding usernames and roles in EKS aws-auth file:
+------------------------------------------------
+
+apiVersion: v1
+data:
+  mapRoles: |
+    - groups:
+      - system:bootstrappers
+      - system:nodes
+      rolearn: <NG name arn>
+      username: <username>
+    - groups:
+      - system:masters
+      rolearn: <role arn>
+      username: <role name>
+    - groups:
+      - system:masters
+      rolearn: <role arn>
+      username: <role arn>
+  mapUsers: |
+    - groups:
+      - system:masters
+      userarn: <username arn>
+      username: <user username>
+    - groups:
+      - system:masters
+      userarn: <username arn>
+      username: <user username>
+    - groups:
+      - system:masters
+      userarn: <username arn>
+      username: <user username>
+kind: ConfigMap
+metadata:
+  creationTimestamp: "2021-09-14T06:30:51Z"
+  name: aws-auth
+  namespace: kube-system
+  resourceVersion: "2227648"
+  uid: 2dd8a468-771f-49a1-96a8-99e534ed2b68
