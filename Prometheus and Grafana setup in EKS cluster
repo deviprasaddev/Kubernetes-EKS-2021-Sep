@@ -58,3 +58,6 @@ or Upload a custom metrics json file
 
 # Access dashboard IDs
 3119/6417
+
+Note: To get grafana password use below command
+      kubectl get secret --namespace grafana grafana -o jsonpath="{.data.admin-password}" | base64 --decode ; echo
