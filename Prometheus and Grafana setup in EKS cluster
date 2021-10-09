@@ -51,7 +51,8 @@ kubectl get svc -n grafana
  password: EKS!sAWSome
  
 11) Import default metrics in the Grafana dashboard
-Click on + icon and select import, now enter the default metrics number ID 3119 and click on 'Load', select 'Import'
+Click on + icon and select import, now enter the default metrics number ID 3119 and click on 'Load'
+Under prometheus dropdown select 'prometheus(default)' and select 'Import'
 
 or Upload a custom metrics json file
 
