@@ -15,3 +15,5 @@ ELK stack setup in EKS cluster using helm charts
 Elastic search deploying in EKS
 
 Setup container insights for monitoring logs and metrics for EKS cluster
+
+Prometheus and Grafana setup in EKS cluster
