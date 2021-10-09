@@ -1,0 +1,59 @@
+Prometheus and Grafana setup in EKS cluster:
+--------------------------------------------
+
+Reference:
+Github - https://github.com/RekhuGopal/PythonHacks/tree/main/AWSBoto3Hacks/Monitoring-AWS-EKS-with-Prometheus-Grafana
+Youtube - https://youtu.be/0S0h7ti_Hl0
+
+1) Add prometheus Helm repo 
+helm repo add prometheus-community https://prometheus-community.github.io/helm-charts
+
+2) Add grafana Helm repo
+helm repo add grafana https://grafana.github.io/helm-charts
+
+3) Deploy Prometheus
+kubectl create namespace prometheus
+helm install prometheus prometheus-community/prometheus --namespace prometheus --set alertmanager.persistentVolume.storageClass="gp2" --set server.persistentVolume.storageClass="gp2"
+	
+4) Check prometheus components deployed as expected
+kubectl get all -n prometheus
+
+
+5) Do kubectl port forwarding from your local machine terminal
+kubectl port-forward -n prometheus deploy/prometheus-server 8080:9090
+
+6) Create a grafana.yaml file and paste below content
+
+datasources:
+  datasources.yaml:
+    apiVersion: 1
+    datasources:
+    - name: Prometheus
+      type: prometheus
+      url: http://prometheus-server.prometheus.svc.cluster.local
+      access: proxy
+      isDefault: true
+
+7) Deploy Grafana using below command, it used above grafana.yaml file and password is mentioned in the below command
+kubectl create namespace grafana
+helm install grafana grafana/grafana --namespace grafana --set persistence.storageClassName="gp2" --set persistence.enabled=true --set adminPassword='EKS!sAWSome' --values ./grafana.yaml --set service.type=LoadBalancer
+
+8) Check if Grafana is deployed
+kubectl get all -n grafana
+
+9) Get Grafana ELB URL using this command
+kubectl get svc -n grafana grafana -o jsonpath='{.status.loadBalancer.ingress[0].hostname}'
+or
+kubectl get svc -n grafana
+
+10) Login to the grafana dashboard using username and password
+ username: admin
+ password: EKS!sAWSome
+ 
+11) Import default metrics in the Grafana dashboard
+Click on + icon and select import, now enter the default metrics number ID 3119 and click on 'Load', select 'Import'
+
+or Upload a custom metrics json file
+
+# Access dashboard IDs
+3119/6417
