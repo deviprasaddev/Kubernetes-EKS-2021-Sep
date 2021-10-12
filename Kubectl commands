@@ -38,3 +38,6 @@ kubectl exec my-pod -c my-container -- ls /         # Run command in existing po
 kubectl top pod POD_NAME --containers               # Show metrics for a given pod and its containers
 kubectl top pod POD_NAME --sort-by=cpu              # Show metrics for a given pod and sort it by 'cpu' or 'memory'
 
+
+kubectl drain my-node                                                 # Drain my-node in preparation for maintenance
+
