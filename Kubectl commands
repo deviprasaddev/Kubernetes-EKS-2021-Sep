@@ -7,3 +7,9 @@ kubectl rollout undo deployment/frontend                         # Rollback to t
 kubectl rollout undo deployment/frontend --to-revision=2         # Rollback to a specific revision
 kubectl rollout status -w deployment/frontend                    # Watch rolling update status of "frontend" deployment until completion
 kubectl rollout restart deployment/frontend                      # Rolling restart of the "frontend" deployment
+
+
+kubectl scale --replicas=3 rs/foo                                 # Scale a replicaset named 'foo' to 3
+kubectl scale --replicas=3 -f foo.yaml                            # Scale a resource specified in "foo.yaml" to 3
+kubectl scale --current-replicas=2 --replicas=3 deployment/mysql  # If the deployment named mysql's current size is 2, scale mysql to 3
+kubectl scale --replicas=5 rc/foo rc/bar rc/baz                   # Scale multiple replication controllers
