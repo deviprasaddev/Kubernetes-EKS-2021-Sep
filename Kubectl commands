@@ -1,0 +1,2 @@
+#display the current-context
+    kubectl config current-context          
