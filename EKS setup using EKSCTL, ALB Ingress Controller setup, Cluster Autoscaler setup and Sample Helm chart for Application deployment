@@ -69,6 +69,8 @@ managedNodeGroups:
   - name: prod-v2
     instanceType: t2.medium
     desiredCapacity: 1
+    minSize: 1
+    maxSize: 5
     privateNetworking: true
     volumeSize: 20
     volumeType: gp3
