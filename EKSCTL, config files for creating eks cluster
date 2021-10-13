@@ -24,6 +24,8 @@ managedNodeGroups:
   - name: ng-1
     instanceType: m5.large
     desiredCapacity: 1
+    minSize: 1
+    maxSize: 5
     privateNetworking: true
     volumeSize: 100
     volumeType: gp3
