@@ -5,7 +5,7 @@ Reference:
 Github - https://github.com/RekhuGopal/PythonHacks/tree/main/AWSBoto3Hacks/Monitoring-AWS-EKS-with-Prometheus-Grafana
 Youtube - https://youtu.be/0S0h7ti_Hl0
 Grafana Dashboard selection - https://grafana.com/grafana/dashboards/?plcmt=footer&search=cluster
-Grafana Dashboard - https://grafana.com/grafana/dashboards/12740
+Grafana Dashboard - https://grafana.com/grafana/dashboards/12740 , KR- https://grafana.com/grafana/dashboards/13770
 
 1) Add prometheus Helm repo 
 helm repo add prometheus-community https://prometheus-community.github.io/helm-charts
@@ -61,7 +61,7 @@ or Upload a custom metrics json file
 -> Used 12740, this dashboard shows clear data of namespaces and pod.
 
 # Access dashboard IDs
-12740/3119/6417
+12740/13770/3119/6417
 
 Note: To get grafana password use below command
       kubectl get secret --namespace grafana grafana -o jsonpath="{.data.admin-password}" | base64 --decode ; echo
