@@ -1,0 +1,4 @@
+#In bash, use below commands to set alias as k
+
+alias k=kubectl
+complete -f _start_kubectl k
