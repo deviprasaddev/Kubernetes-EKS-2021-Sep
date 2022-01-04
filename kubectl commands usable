@@ -1,0 +1,9 @@
+kubectl exec:
+
+kubectl exec -it -n <namespace> <nginxingress_controller_podname> -- /nginx-ingress-controller --version
+Ex:
+kubectl exec -it -n ingress-nginx ingress-nginx-controller-68534fsd7f8-6czds -- /nginx-ingress-controller --version
+
+kubectl exec -it -n <namespace> <podname> ash 
+
+kubectl exec -it -n <namespace> <podname> bash
