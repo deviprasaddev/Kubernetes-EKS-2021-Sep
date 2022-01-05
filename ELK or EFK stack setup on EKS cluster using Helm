@@ -1,0 +1,182 @@
+ELK or EFK stack setup on EKS cluster using Helm:
+-------------------------------------------------
+
+Elasticsearch:
+--------------
+
+1) Create a namespace to deploy the stack
+
+		kubectl create ns efk
+
+2) Add elatic repo URL which has stack helm charts and list the repo
+
+		helm repo add elastic https://helm.elastic.co
+	
+		helm repo ls
+
+3) Append the elatic search values into a file using below command
+
+		helm show values elastic/elasticsearch >> elasticsearch.values
+
+4) Make the necessary changes as below in the values file
+
+	a) Change the replica of master and pod to 1 or if we require more master and slave then increase the replica number to 3 and 2
+
+5) Install elastic search using below command using values file
+
+		helm install elasticsearch elastic/elasticsearch -f elasticsearch.values -n efk
+
+6) List the deployed resource in elk namespace and check is everything is in running state
+
+		kubectl get all -n elk
+
+
+
+Kibana:
+-------
+
+Method (1): Access kibana using ALB, Best practice
+---------------------------------------------------
+
+1) As we have added the elastic repo already, append the elatic search values into a file using below command
+ 
+		helm show values elastic/kibana >> kibana.values
+
+2) Make the necessary changes as below in the kibana values file to access grafana using ALB endpoint
+	
+	ALB: To access grafana using ALB then we need to change the service type to ClusterIP and service port to 80
+	
+3) Install kibana using below command using kibana values file	
+
+		helm install kibana elastic/kibana -f kibana.values -n efk
+
+4) List the deployed resource in elk namespace and check is everything is in running state
+
+		kubectl get all -n elk
+
+5) Now we need to create ingress file(kibana-ingress.yaml) with below content
+
+	a) If you want to access grafana through ALB endpoint then we need create ingress file with below content and apply ingress file without host name as below
+
+apiVersion: extensions/v1beta1
+kind: Ingress
+metadata:
+  namespace: efk
+  name: kibana-ingress
+  annotations:
+    kubernetes.io/ingress.class: alb
+    alb.ingress.kubernetes.io/scheme: internet-facing
+    alb.ingress.kubernetes.io/target-type: ip
+spec:
+  rules:
+    - http:
+        paths:
+          - path: /*
+            backend:
+              serviceName: kibana-kibana
+              servicePort: 80 
+
+or
+
+		a) If you want to access grafana through host/domain name then we want to create ingress file with below content and apply ingress file with host name as below
+
+apiVersion: extensions/v1beta1
+kind: Ingress
+metadata:
+  namespace: efk
+  name: kibana-ingress
+  annotations:
+    kubernetes.io/ingress.class: alb
+    alb.ingress.kubernetes.io/scheme: internet-facing
+    alb.ingress.kubernetes.io/target-type: ip
+spec:
+  rules:
+  - host: <DomainName>
+    http:
+      paths:
+      - backend:
+          serviceName: kibana-kibana
+          servicePort: 80
+        path: /*
+
+6) Apply the create ingress file(kibana-ingress.yaml) using below command
+
+		kubectl apply -f kibana-ingress.yaml
+
+7) Now run below command to get ALB endpoint or host/domain name to access grafana
+
+		kubectl get ing -n efk
+
+
+
+Method (2): Access Kibana using CLB, not best practice
+-------------------------------------------------------
+
+1) As we have added the elastic repo already, append the elatic search values into a file using below command
+ 
+		helm show values elastic/kibana >> kibana.values
+
+2) Make the necessary changes as below in the kibana values file to access grafana using CLB or ALB endpoint
+	
+	CLB: To access grafana using CLB then we need to change the service type to LoadBalancer and service port to 80
+	
+	ALB: To access grafana using ALB then we need to change the service type to ClusterIP and service port to 80
+	
+3) Install kibana using below command using kibana values file	
+
+		helm install kibana elastic/kibana -f kibana.values -n efk
+		
+4) List the deployed resource in elk namespace and check is everything is in running state
+
+		kubectl get all -n elk
+	
+5) Run below command to get CLB endpoint
+
+		kubectl get svc -n elk
+		
+7) Paste the CLB endpoint in browser and search to access kibana
+
+
+
+Filebeat:
+---------
+
+1) As we have added the elastic repo already, if need to change any configuration in filebeat then we need to install filebeat using values file
+
+2) Install filebeat using below command
+
+		helm install filebeat elastic/filebeat -n efk
+
+3) List the deployed resource in elk namespace and check is everything is in running state
+
+		kubectl get all -n elk
+
+4) Now access kibana and check if the pods are generating in kibana
+
+
+
+Kibana configuration:
+---------------------
+
+1) Access the kibana home page and click on top left dropdown(on 3lines)
+
+2) Scroll down and click on 'Discover' under 'Analytics'
+
+3) Now select 'Add filter' and enter 'filebeat-*' and search
+
+4) Observe the logs which is pushed to kibana from filebeat
+
+5) Also we can see the logs with pod name and namespace
+
+6) Go back and click on 'Logs' under 'Observibility'
+
+7) Click on settings on top right and scroll down
+
+8) In 'Log indicies', enter the log format (Ex: logs-*,filebeat-*,kibana_sample_data_logs*)
+
+9) In 'Log columns', click on 'Add columns'
+
+10) Search and add 'kubernetes.pod.name' and 'kubernetes.namespace' filter and click on 'Apply' in below
+
+11) Also, there are more filters which can be added
+
