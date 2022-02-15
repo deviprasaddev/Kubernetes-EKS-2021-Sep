@@ -46,6 +46,9 @@ EKS setup using EKSCTL:
 -----------------------
 
 https://eksctl.io/usage/creating-and-managing-clusters/
+Use required schema/options for custer config from this page - https://eksctl.io/usage/schema/
+
+amiFamily - AmazonLinux2 (default), Ubuntu2004, Ubuntu1804
 
 1) Create a file(ex: cluster-config.yaml) and paste below configurations. Change the VPC and Subnet id's in the file.
 
@@ -54,23 +57,26 @@ kind: ClusterConfig
 metadata:
   name: demo-cluster-eksctl-prod
   region: ap-south-1
-  version: "1.19"
+  version: "1.21"
 vpc:
-  id: vpc-0c4e4648ffafe36a8
+  id: <vpc-id>
   subnets:
     public:
       public-1a:
-        id: subnet-0c5a7b67fc928a2e8
+        id: <subnet-id>
       public-1b:
-        id: subnet-0b20f2858291fb4b6
+        id: <subnet-id>
     private:
       private-1a:
-        id: subnet-01e1c53f586267b25
+        id: <subnet-id>
       private-1b:
-        id: subnet-095913b978b8b2a65
+        id: <subnet-id>
 managedNodeGroups:
   - name: prod-v2
+    amiFamily: AmazonLinux2
     instanceType: t2.medium
+    ssh:
+      publicKeyName: <keypairname>
     desiredCapacity: 1
     minSize: 1
     maxSize: 5
