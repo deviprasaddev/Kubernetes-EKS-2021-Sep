@@ -325,6 +325,27 @@ metadata:
     kubernetes.io/ingress.class: alb
     alb.ingress.kubernetes.io/scheme: internet-facing
     alb.ingress.kubernetes.io/target-type: ip
+apiVersion: extensions/v1beta1
+kind: Ingress
+metadata:
+  namespace: efk
+  name: kibana-ingress
+  annotations:
+    kubernetes.io/ingress.class: alb
+    alb.ingress.kubernetes.io/scheme: internet-facing
+    alb.ingress.kubernetes.io/target-type: ip
+spec:
+  rules:
+  - host: <DomainName>
+    http:
+      paths:
+      - backend:
+          serviceName: {{ .Values.applicationname.meta.name }}
+          servicePort: {{ .Values.applicationname.rules.serviceport }}
+        path: /*
+
+(or)
+
 spec:
   rules:
     - http:
