@@ -1,0 +1,138 @@
+Security best practices in EKS:
+-------------------------------
+
+1. Implementing Network Policies 
+
+a. Add labels to all namespace's
+
+	kubectl label ns <namespace> <key>=<value>
+
+b. Create all deny ingress network policy with name 'deny-ingress-netpol.yaml'
+
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: deny-netpol
+  namespace: vtransact-digitb
+spec:
+  podSelector: {}
+  policyTypes:
+  - Ingress
+
+c. Create allow ingress network policy from required namespace and pods with name 'allow-ingress-netpol.yaml'
+
+kind: NetworkPolicy
+apiVersion: networking.k8s.io/v1
+metadata:
+  namespace: vtransact-digitb
+  name: prod-app-allow-netpol
+spec:
+  podSelector:
+    matchLabels: {}
+  ingress:
+    - from:
+        - namespaceSelector:
+            matchLabels:
+              app: istio-system
+        - namespaceSelector:
+            matchLabels:
+              app: kube-system
+        - namespaceSelector:
+            matchLabels:
+              app: vtransact-digitb
+        - podSelector:
+            matchLabels:
+              app: label
+        - podSelector:
+            matchLabels:
+              app: istio-ingressgateway
+        - podSelector:
+            matchLabels:
+              app: istiod
+
+
+2. Block pod access to AWS Instance Metadata Service (IMDS)
+
+a. Create deny imds egress  for imds ip'169.254.169.254/32' network policy with name 'deny-egress-netpol.yaml'
+
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: deny-egress-imds-netpol
+  namespace: <namespace>
+spec:
+  podSelector: {}
+  policyTypes:
+  - Egress
+  egress:
+  - to:
+    - ipBlock:
+        cidr: 0.0.0.0/0
+        except:
+        - 169.254.169.254/32
+
+		
+3. Removing default EKS Pod Security Policy ClusterRoleBinding group authorization
+
+a. Remove the default `ClusterRoleBinding` allowing the `system:authenticated` group to use the PSP `eks.permissive`. Remove or delete the group authentication in clusterrolebinding
+
+
+4. Kubernetes Service Account Tokens Automatically Mounted
+
+a. Disable automatic mounting of credentials for the default service account in each namespace.
+
+This can be accomplished per-service account or per-pod. For a service account, the field `automountServiceAccountToken` should be set to `False`. For a pod, the value `spec.automountServiceAccountToken` should be set to `False`.
+
+To view the service account specification for all service accounts the following command can be executed:
+
+kubectl get serviceaccount -A -o yaml
+
+Note that `automountServiceAccountToken` is not set to `False`
+
+5. Security-Focussed Admission Controllers PSS/PSA
+
+a. As PSP is depricated in 1.23v, so need to implemented PSS and PSA.
+
+We have to configure PSS and PSA policies using 3 modes as mentioned below in namespace.
+
+pod-security.kubernetes.io/audit: restricted
+pod-security.kubernetes.io/enforce: restricted
+pod-security.kubernetes.io/warn: restricted 
+
+Also, we have configured the security context accordingly to run application as non-root user, used below security context configuration.
+
+securityContext:
+  allowPrivilegeEscalation: false
+  runAsNonRoot: true
+
+
+6. Kubernetes Workload Hardening with securityContext in deployment/pod
+
+a. As per the recomendations, we have added security context to reduce the isolation.
+Please find the security context added in manifest files.
+
+securityContext:
+  allowPrivilegeEscalation: false
+  runAsNonRoot: true
+  runAsNonRoot: true
+  runAsGroup: 1337
+  runAsUser: 1337
+  capabilities:
+    drop:
+    - ALL
+  seccompProfile:
+    type: RuntimeDefault
+	
+
+7. Disable publicly Accessible for EKS Clusters
+
+a. During cluster setup, set API server endpoint access to private 
+
+If API server endpoint access is set to public during cluster setup then modify API server endpoint access to private in EKS cluster console.
+
+
+8. Untrusted Container Image in use and Public Container Image Repositories Accessible
+
+a. Moved all untrusted container images to private ECR repo
+
+Only trusted external source can be used like prometheus, grafana, istio etc.
