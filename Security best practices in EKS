@@ -100,6 +100,18 @@ To view the service account specification for all service accounts the following
 
 kubectl get serviceaccount -A -o yaml
 
+apiVersion: v1
+kind: ServiceAccount
+automountServiceAccountToken: false
+metadata:
+  creationTimestamp: <>
+  name: default
+  namespace: kube-system
+  resourceVersion: <>
+  uid: <>
+secrets:
+- name: <>
+
 Note that `automountServiceAccountToken` is not set to `False`
 
 5. Security-Focussed Admission Controllers PSS/PSA
