@@ -1,9 +1,18 @@
 Security best practices in EKS:
 -------------------------------
 
-1. Implementing Network Policies 
+1. Install calico and implementing Network Policies 
 
-a. Deploy Calico
+Reference - https://docs.aws.amazon.com/eks/latest/userguide/calico.html
+			https://kubernetes.io/docs/concepts/services-networking/network-policies/
+
+a. Install calico using below commands
+
+	helm repo add projectcalico https://docs.projectcalico.org/charts
+	helm repo update                         
+	helm install calico projectcalico/tigera-operator --version v3.21.4
+	kubectl get all -n tigera-operator
+	kubectl get all -n calico-system
 
 a. Add labels to all namespace's
 
