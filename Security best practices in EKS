@@ -3,6 +3,8 @@ Security best practices in EKS:
 
 1. Implementing Network Policies 
 
+a. Deploy Calico
+
 a. Add labels to all namespace's
 
 	kubectl label ns <namespace> <key>=<value>
@@ -84,6 +86,8 @@ a. Disable automatic mounting of credentials for the default service account in 
 This can be accomplished per-service account or per-pod. For a service account, the field `automountServiceAccountToken` should be set to `False`. For a pod, the value `spec.automountServiceAccountToken` should be set to `False`.
 
 To view the service account specification for all service accounts the following command can be executed:
+
+ kubectl get sa -A | grep default
 
 kubectl get serviceaccount -A -o yaml
 
